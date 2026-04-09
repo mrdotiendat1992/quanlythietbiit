@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử làm việc IT</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body id="page-logs">
+    <aside class="sidebar">
+        <div class="sidebar-header">🏢 IT System</div>
+        <nav class="nav-links">
+            <a href="/">📊 Dashboard</a>
+            <a href="/departments.html">🏢 Phòng ban</a>
+            <a href="/equipments.html">💻 Thiết bị</a>
+            <a href="/logs.html" class="active">📝 Lịch sử IT</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Lịch sử làm việc IT</h1>
+            <button class="btn btn-primary" onclick="openModal('modal-log')">+ Ghi log công việc</button>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Nhân sự IT</th>
+                        <th>Mô tả công việc</th>
+                        <th>Thiết bị liên quan</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody">
+                    <!-- Dữ liệu JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Thêm Log -->
+    <div class="modal-overlay" id="modal-log">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Ghi log công việc mới</h2>
+                <button class="close-btn" onclick="closeModal('modal-log')">×</button>
+            </div>
+            <form id="form-log">
+                <div class="form-group">
+                    <label>Nhân sự IT thực hiện</label>
+                    <input type="text" id="log-personnel" class="form-control" required placeholder="Tên NV IT">
+                </div>
+                <div class="form-group">
+                    <label>Mô tả công việc / Sự cố</label>
+                    <textarea id="log-desc" class="form-control" rows="3" required placeholder="Đã cài Win, xử lý mạng chậm..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Thiết bị liên quan (Không bắt buộc)</label>
+                    <select id="log-equipment" class="form-control">
+                        <option value="">-- Không có thiết bị cụ thể / Sự cố chung --</option>
+                        <!-- Render từ JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Trạng thái xử lý</label>
+                    <select id="log-status" class="form-control">
+                        <option value="Đã hoàn thành">Đã hoàn thành</option>
+                        <option value="Đang xử lý">Đang xử lý</option>
+                        <option value="Cần mua linh kiện">Cần mua linh kiện</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" style="background:#E5E7EB; color:#374151" onclick="closeModal('modal-log')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu Log</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
