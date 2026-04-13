@@ -173,20 +173,25 @@ function resetEquipmentModal() {
     setEquipmentType('Máy tính bàn');
 }
 
-function openEquipmentModal(equipment = null, departmentId = null) {
+function buildDuplicateEquipmentName(name) {
+    const base = (name || 'Thiết bị').trim();
+    return base.endsWith(' (Bản sao)') ? base : `${base} (Bản sao)`;
+}
+
+function openEquipmentModal(equipment = null, departmentId = null, mode = 'edit') {
     resetEquipmentModal();
 
     if (equipment) {
         const hiddenId = document.getElementById('eq-id');
-        if (hiddenId) hiddenId.value = equipment.id;
+        if (hiddenId) hiddenId.value = mode === 'edit' ? equipment.id : '';
 
         const title = document.getElementById('equipment-modal-title');
-        if (title) title.textContent = 'Sửa thiết bị';
+        if (title) title.textContent = mode === 'duplicate' ? 'Nhân bản thiết bị' : 'Sửa thiết bị';
 
         const submitBtn = document.getElementById('equipment-submit-btn');
-        if (submitBtn) submitBtn.textContent = 'Cập nhật';
+        if (submitBtn) submitBtn.textContent = mode === 'duplicate' ? 'Tạo bản sao' : 'Cập nhật';
 
-        document.getElementById('eq-name').value = equipment.name || '';
+        document.getElementById('eq-name').value = mode === 'duplicate' ? buildDuplicateEquipmentName(equipment.name) : (equipment.name || '');
         document.getElementById('eq-status').value = equipment.status || 'Đang sử dụng';
         document.getElementById('eq-user').value = equipment.user_assigned || '';
         document.getElementById('eq-department').value = equipment.department_id ? String(equipment.department_id) : '';
@@ -645,6 +650,7 @@ async function loadEquipments() {
                 <td>${escapeHtml(getDeptName(eq.department_id))}</td>
                 <td>${escapeHtml(eq.user_assigned || '')}</td>
                 <td>
+                    <button class="btn" style="margin-right: 8px;" onclick="duplicateEquipment(${eq.id})">Nhân bản</button>
                     <button class="btn" style="margin-right: 8px;" onclick="openEquipmentDetail(${eq.id})">Xem</button>
                     <button class="btn btn-primary" style="margin-right: 8px;" onclick="editEquipment(${eq.id})">Sửa</button>
                     <button class="btn btn-danger" onclick="deleteEquipment(${eq.id})">Xóa</button>
@@ -661,6 +667,12 @@ function editEquipment(id) {
     const equipment = equipmentCache.find(item => item.id === id);
     if (!equipment) return;
     openEquipmentModal(equipment);
+}
+
+function duplicateEquipment(id) {
+    const equipment = equipmentCache.find(item => item.id === id);
+    if (!equipment) return;
+    openEquipmentModal(equipment, null, 'duplicate');
 }
 
 function openEquipmentDetail(id) {

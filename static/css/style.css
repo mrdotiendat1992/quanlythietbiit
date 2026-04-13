@@ -232,6 +232,20 @@ tr:hover {
   gap: 12px;
   margin-top: 8px;
 }
+.spec-grid-compact {
+  grid-template-columns: minmax(220px, 320px);
+}
+.spec-subgroup {
+  margin-top: 12px;
+}
+.spec-subtitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 .spec-field label {
   display: block;
   margin-bottom: 6px;
