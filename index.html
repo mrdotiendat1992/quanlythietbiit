@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Equipment Dashboard</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body id="page-dashboard">
+    <aside class="sidebar">
+        <div class="sidebar-header">🏢 IT System</div>
+        <nav class="nav-links">
+            <a href="index.html" class="active">📊 Dashboard</a>
+            <a href="departments.html">🏢 Phòng ban</a>
+            <a href="equipments.html">💻 Thiết bị</a>
+            <a href="logs.html">📝 Lịch sử IT</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard Tổng Quan</h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Tổng số phòng ban</h3>
+                <div class="value" id="stat-departments">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Tổng số thiết bị</h3>
+                <div class="value" id="stat-equipments">0</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 10px;">Thống Kê Thiết Bị Theo Phân Loại</h2>
+            <div id="equipment-types-container" class="stats-grid" style="margin-top: 15px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
+                <p style="color: var(--text-light);">Đang tải dữ liệu...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Welcome to IT Equipment Management System 👋</h2>
+            <p style="color: var(--text-light); margin-top: 10px;">
+                Quản lý thiết bị máy tính, máy in theo từng phòng ban và ghi chú lịch sử làm việc/cài đặt/sửa chữa của IT nội bộ.
+            </p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="static/js/supabase-config.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+</html>

@@ -1,12 +1,13 @@
 # 💻 Phần Mềm Quản Lý Thiết Bị IT (IT Equipment Management)
 
-Ứng dụng web nội bộ hỗ trợ phòng IT quản lý danh sách thiết bị công nghệ, phòng ban, và lưu trữ lịch sử nhật ký bảo trì/sửa chữa. Hệ thống được thiết kế chạy dưới dạng một Server Web cục bộ nhưng có thể đóng gói thành một file ứng dụng `.exe` sử dụng dễ dàng trên mọi máy tính Windows mà không cần cài đặt rườm rà.
+Ứng dụng web hỗ trợ phòng IT quản lý danh sách thiết bị công nghệ, phòng ban, và lưu trữ lịch sử nhật ký bảo trì/sửa chữa. Phiên bản mới có thể chạy trên GitHub Pages và lưu dữ liệu trên Supabase.
 
 ## 🚀 Tính năng nổi bật
 - **Quản lý Phòng Ban:** Quản lý các đơn vị phòng ban dễ dàng để quy trách nhiệm khi phân bổ thiết bị.
 - **Quản lý Thiết Bị IT:** Theo dõi vòng đời, nguồn gốc và danh mục thiết bị của toàn công ty trên giao diện web trực quan.
+- **Thông số theo loại thiết bị:** Máy tính/laptop có thể lưu main, chip, RAM, ổ cứng, màn hình, bàn phím, chuột; máy in có thể lưu IP và loại máy.
 - **Lịch Sử Sửa Chữa (IT Logs):** Ghi nhớ lại nhật ký xử lý, bảo trì và log công việc xử lý sự cố hàng ngày của nhân viên.
-- **Lightweight & Portable:** Đóng gói tất cả trong một file chạy `.exe` với Database nhỏ gọn (SQLite). Người dùng cuối có thể click chạy ngay không cần cài đặt Python hay máy chủ.
+- **GitHub Pages + Supabase:** Frontend tĩnh, backend không cần riêng. Dữ liệu lưu trên Supabase Postgres.
 
 ## 🛠️ Công Nghệ Sử Dụng
 - **Backend Server:** Python 3, FastAPI, Uvicorn 
@@ -26,6 +27,13 @@ quanlythietbiit/
 ├── requirements.txt            # Danh sách thư viện Python cần thiết
 └── build_and_push.bat          # ⚡ Script Tự động Build file .exe và đẩy code lên Github
 ```
+
+## 🚀 Deploy GitHub Pages + Supabase
+1. Tạo project Supabase.
+2. Chạy file `supabase-schema.sql` trong SQL Editor.
+3. Lấy `Project URL` và `anon public key`.
+4. Điền vào `static/js/supabase-config.js`.
+5. Đẩy repo lên GitHub và bật GitHub Pages từ nhánh chứa `index.html`.
 
 ## ⚙️ Hướng dẫn Quản Lý Source Code (Dành cho Lập trình viên)
 

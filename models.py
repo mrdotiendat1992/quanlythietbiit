@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship
 import datetime
 from database import Base
@@ -11,6 +11,7 @@ class Department(Base):
     description = Column(String)
 
     equipments = relationship("Equipment", back_populates="department")
+    logs = relationship("ITLog", back_populates="department")
 
 
 class Equipment(Base):
@@ -21,6 +22,7 @@ class Equipment(Base):
     type = Column(String, index=True)
     status = Column(String) # e.g. 'Active', 'Broken', 'Repairing'
     user_assigned = Column(String)
+    specs = Column(JSON, nullable=True)
     
     department_id = Column(Integer, ForeignKey("departments.id"))
     department = relationship("Department", back_populates="equipments")
@@ -38,3 +40,5 @@ class ITLog(Base):
     
     equipment_id = Column(Integer, ForeignKey("equipments.id"), nullable=True)
     equipment = relationship("Equipment", back_populates="logs")
+    department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
+    department = relationship("Department", back_populates="logs")

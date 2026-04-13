@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Dict, Optional, Any
 from datetime import datetime
 
 # Department Schemas
@@ -22,6 +22,7 @@ class ITLogBase(BaseModel):
     description: str
     status: str
     equipment_id: Optional[int] = None
+    department_id: Optional[int] = None
 
 class ITLogCreate(ITLogBase):
     pass
@@ -29,6 +30,7 @@ class ITLogCreate(ITLogBase):
 class ITLog(ITLogBase):
     id: int
     date: datetime
+    department: Optional[Department] = None
     
     class Config:
         from_attributes = True
@@ -39,6 +41,7 @@ class EquipmentBase(BaseModel):
     type: str
     status: str
     user_assigned: Optional[str] = None
+    specs: Optional[Dict[str, Any]] = None
     department_id: Optional[int] = None
 
 class EquipmentCreate(EquipmentBase):

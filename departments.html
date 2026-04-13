@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Phòng ban</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body id="page-departments">
     <aside class="sidebar">
         <div class="sidebar-header">🏢 IT System</div>
         <nav class="nav-links">
-            <a href="/">📊 Dashboard</a>
-            <a href="/departments.html" class="active">🏢 Phòng ban</a>
-            <a href="/equipments.html">💻 Thiết bị</a>
-            <a href="/logs.html">📝 Lịch sử IT</a>
+            <a href="index.html">📊 Dashboard</a>
+            <a href="departments.html" class="active">🏢 Phòng ban</a>
+            <a href="equipments.html">💻 Thiết bị</a>
+            <a href="logs.html">📝 Lịch sử IT</a>
         </nav>
     </aside>
 
@@ -27,21 +28,18 @@
             <table>
                 <thead>
                     <tr>
-                <th>ID</th>
-                <th>Tên phòng ban</th>
-                <th>Mô tả</th>
-                <th>Thao tác nhanh</th>
-                <th>Thao tác</th>
-            </tr>
+                        <th>ID</th>
+                        <th>Tên phòng ban</th>
+                        <th>Mô tả</th>
+                        <th>Thao tác nhanh</th>
+                        <th>Thao tác</th>
+                    </tr>
                 </thead>
-                <tbody id="departments-tbody">
-                    <!-- Dữ liệu JS -->
-                </tbody>
+                <tbody id="departments-tbody"></tbody>
             </table>
         </div>
     </main>
 
-    <!-- Modal Thêm Department -->
     <div class="modal-overlay" id="modal-department">
         <div class="modal">
             <div class="modal-header">
@@ -66,6 +64,8 @@
         </div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="static/js/supabase-config.js"></script>
+    <script src="static/js/app.js"></script>
 </body>
 </html>

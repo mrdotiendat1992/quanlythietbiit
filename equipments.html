@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Thiết bị</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body id="page-equipments">
     <aside class="sidebar">
         <div class="sidebar-header">🏢 IT System</div>
         <nav class="nav-links">
-            <a href="/">📊 Dashboard</a>
-            <a href="/departments.html">🏢 Phòng ban</a>
-            <a href="/equipments.html" class="active">💻 Thiết bị</a>
-            <a href="/logs.html">📝 Lịch sử IT</a>
+            <a href="index.html">📊 Dashboard</a>
+            <a href="departments.html">🏢 Phòng ban</a>
+            <a href="equipments.html" class="active">💻 Thiết bị</a>
+            <a href="logs.html">📝 Lịch sử IT</a>
         </nav>
     </aside>
 
@@ -37,14 +38,11 @@
                         <th>Thao tác</th>
                     </tr>
                 </thead>
-                <tbody id="equipments-tbody">
-                    <!-- Dữ liệu JS -->
-                </tbody>
+                <tbody id="equipments-tbody"></tbody>
             </table>
         </div>
     </main>
 
-    <!-- Modal Thêm Equipment -->
     <div class="modal-overlay" id="modal-equipment">
         <div class="modal">
             <div class="modal-header">
@@ -84,48 +82,21 @@
                     <h3 class="equipment-spec-title">Thông số máy tính / laptop</h3>
                     <p class="equipment-spec-note">Nhập cấu hình và phụ kiện đi kèm cho máy tính.</p>
                     <div class="spec-grid">
-                        <div class="spec-field">
-                            <label>Mã main</label>
-                            <input type="text" id="eq-spec-main_code" class="form-control" placeholder="VD: MSI B560...">
-                        </div>
-                        <div class="spec-field">
-                            <label>Chip</label>
-                            <input type="text" id="eq-spec-chip" class="form-control" placeholder="VD: i5-10400">
-                        </div>
-                        <div class="spec-field">
-                            <label>RAM</label>
-                            <input type="text" id="eq-spec-ram" class="form-control" placeholder="VD: 16GB">
-                        </div>
-                        <div class="spec-field">
-                            <label>Ổ cứng</label>
-                            <input type="text" id="eq-spec-hard_drive" class="form-control" placeholder="VD: SSD 512GB">
-                        </div>
-                        <div class="spec-field">
-                            <label>Màn hình</label>
-                            <input type="text" id="eq-spec-monitor" class="form-control" placeholder="VD: 24 inch">
-                        </div>
-                        <div class="spec-field">
-                            <label>Bàn phím</label>
-                            <input type="text" id="eq-spec-keyboard" class="form-control" placeholder="VD: Có / Không">
-                        </div>
-                        <div class="spec-field">
-                            <label>Chuột</label>
-                            <input type="text" id="eq-spec-mouse" class="form-control" placeholder="VD: Có / Không">
-                        </div>
+                        <div class="spec-field"><label>Mã main</label><input type="text" id="eq-spec-main_code" class="form-control"></div>
+                        <div class="spec-field"><label>Chip</label><input type="text" id="eq-spec-chip" class="form-control"></div>
+                        <div class="spec-field"><label>RAM</label><input type="text" id="eq-spec-ram" class="form-control"></div>
+                        <div class="spec-field"><label>Ổ cứng</label><input type="text" id="eq-spec-hard_drive" class="form-control"></div>
+                        <div class="spec-field"><label>Màn hình</label><input type="text" id="eq-spec-monitor" class="form-control"></div>
+                        <div class="spec-field"><label>Bàn phím</label><input type="text" id="eq-spec-keyboard" class="form-control"></div>
+                        <div class="spec-field"><label>Chuột</label><input type="text" id="eq-spec-mouse" class="form-control"></div>
                     </div>
                 </div>
                 <div class="equipment-spec-panel is-hidden" data-equipment-spec-panel="printer">
                     <h3 class="equipment-spec-title">Thông số máy in</h3>
                     <p class="equipment-spec-note">Quản lý IP và model để hỗ trợ mạng in nhanh hơn.</p>
                     <div class="spec-grid">
-                        <div class="spec-field">
-                            <label>IP</label>
-                            <input type="text" id="eq-spec-ip_address" class="form-control" placeholder="VD: 192.168.1.120">
-                        </div>
-                        <div class="spec-field">
-                            <label>Loại máy</label>
-                            <input type="text" id="eq-spec-printer_model" class="form-control" placeholder="VD: LaserJet Pro M404dn">
-                        </div>
+                        <div class="spec-field"><label>IP</label><input type="text" id="eq-spec-ip_address" class="form-control"></div>
+                        <div class="spec-field"><label>Loại máy</label><input type="text" id="eq-spec-printer_model" class="form-control"></div>
                     </div>
                 </div>
                 <div class="equipment-spec-panel is-hidden" data-equipment-spec-panel="other">
@@ -142,10 +113,7 @@
                 </div>
                 <div class="form-group">
                     <label>Phân bổ cho phòng ban</label>
-                    <select id="eq-department" class="form-control">
-                        <option value="">-- Chưa phân bổ --</option>
-                        <!-- Render từ JS -->
-                    </select>
+                    <select id="eq-department" class="form-control"><option value="">-- Chưa phân bổ --</option></select>
                 </div>
                 <div class="form-group">
                     <label>Người dùng (Tên NV)</label>
@@ -159,6 +127,8 @@
         </div>
     </div>
 
-    <script src="/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="static/js/supabase-config.js"></script>
+    <script src="static/js/app.js"></script>
 </body>
 </html>
