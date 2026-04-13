@@ -83,6 +83,14 @@ body {
   box-shadow: var(--shadow);
   margin-bottom: 20px;
 }
+.equipment-toolbar {
+  padding-bottom: 12px;
+}
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
 
 /* Stats */
 .stats-grid {

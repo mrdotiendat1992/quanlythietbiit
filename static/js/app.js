@@ -35,6 +35,13 @@ const EQUIPMENT_SPEC_FIELDS = {
 let equipmentCache = [];
 let departmentCache = [];
 let logCache = [];
+let equipmentFilters = {
+    search: '',
+    type: '',
+    department: '',
+    status: '',
+    sort: 'id-asc',
+};
 
 // Utility functions
 async function fetchAPI(endpoint, method = 'GET', data = null) {
@@ -210,6 +217,58 @@ function getEquipmentSpecFields(type) {
     return EQUIPMENT_SPEC_FIELDS[type] || [];
 }
 
+function normalizeText(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function getEquipmentDepartmentName(id) {
+    return departmentCache.find(item => item.id === id)?.name || 'N/A';
+}
+
+function getSortedAndFilteredEquipments() {
+    const filtered = equipmentCache.filter(eq => {
+        const matchesSearch = !equipmentFilters.search || normalizeText(eq.name).includes(normalizeText(equipmentFilters.search));
+        const matchesType = !equipmentFilters.type || eq.type === equipmentFilters.type;
+        const matchesDepartment = !equipmentFilters.department || String(eq.department_id || '') === equipmentFilters.department;
+        const matchesStatus = !equipmentFilters.status || eq.status === equipmentFilters.status;
+        return matchesSearch && matchesType && matchesDepartment && matchesStatus;
+    });
+
+    filtered.sort((a, b) => {
+        if (equipmentFilters.sort === 'id-desc') return (b.id || 0) - (a.id || 0);
+        if (equipmentFilters.sort === 'name-asc') return normalizeText(a.name).localeCompare(normalizeText(b.name));
+        if (equipmentFilters.sort === 'name-desc') return normalizeText(b.name).localeCompare(normalizeText(a.name));
+        return (a.id || 0) - (b.id || 0);
+    });
+
+    return filtered;
+}
+
+function renderEquipmentTypeOptions() {
+    const select = document.getElementById('equipment-filter-type');
+    if (!select) return;
+    const types = [...new Set(equipmentCache.map(eq => eq.type).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    select.innerHTML = '<option value="">Tất cả loại</option>';
+    types.forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type;
+        select.appendChild(opt);
+    });
+}
+
+function renderEquipmentDepartmentOptions() {
+    const select = document.getElementById('equipment-filter-department');
+    if (!select) return;
+    select.innerHTML = '<option value="">Tất cả phòng ban</option>';
+    departmentCache.forEach(dept => {
+        const opt = document.createElement('option');
+        opt.value = dept.id;
+        opt.textContent = dept.name;
+        select.appendChild(opt);
+    });
+}
+
 function syncEquipmentSpecPanels(type) {
     const activePanel = getEquipmentSpecPanelKey(type);
     document.querySelectorAll('[data-equipment-spec-panel]').forEach(panel => {
@@ -243,6 +302,69 @@ function formatEquipmentSpecs(type, specs) {
         .map(field => specs[field.key] ? `${field.label}: ${specs[field.key]}` : null)
         .filter(Boolean)
         .join(' | ') || '-';
+}
+
+function refreshEquipmentList() {
+    const tbody = document.getElementById('equipments-tbody');
+    if (!tbody) return;
+
+    const equipments = getSortedAndFilteredEquipments();
+
+    tbody.innerHTML = '';
+    if (equipments.length > 0) {
+        equipments.forEach(eq => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${eq.id}</td>
+                <td>${escapeHtml(eq.name)}</td>
+                <td>${escapeHtml(eq.type)}</td>
+                <td>${escapeHtml(formatEquipmentSpecs(eq.type, eq.specs))}</td>
+                <td>${escapeHtml(eq.status)}</td>
+                <td>${escapeHtml(getEquipmentDepartmentName(eq.department_id))}</td>
+                <td>${escapeHtml(eq.user_assigned || '')}</td>
+                <td>
+                    <button class="btn" style="margin-right: 8px;" onclick="duplicateEquipment(${eq.id})">Nhân bản</button>
+                    <button class="btn" style="margin-right: 8px;" onclick="openEquipmentDetail(${eq.id})">Xem</button>
+                    <button class="btn btn-primary" style="margin-right: 8px;" onclick="editEquipment(${eq.id})">Sửa</button>
+                    <button class="btn btn-danger" onclick="deleteEquipment(${eq.id})">Xóa</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } else {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Chưa có dữ liệu</td></tr>';
+    }
+}
+
+function bindEquipmentFilters() {
+    const search = document.getElementById('equipment-search');
+    const type = document.getElementById('equipment-filter-type');
+    const department = document.getElementById('equipment-filter-department');
+    const status = document.getElementById('equipment-filter-status');
+    const sort = document.getElementById('equipment-sort');
+
+    const apply = () => refreshEquipmentList();
+
+    search?.addEventListener('input', (e) => {
+        equipmentFilters.search = e.target.value;
+        apply();
+    });
+    type?.addEventListener('change', (e) => {
+        equipmentFilters.type = e.target.value;
+        apply();
+    });
+    department?.addEventListener('change', (e) => {
+        equipmentFilters.department = e.target.value;
+        apply();
+    });
+    status?.addEventListener('change', (e) => {
+        equipmentFilters.status = e.target.value;
+        apply();
+    });
+    sort?.addEventListener('change', (e) => {
+        equipmentFilters.sort = e.target.value;
+        apply();
+    });
 }
 
 function renderEquipmentSpecsDetail(type, specs) {
@@ -617,6 +739,7 @@ async function initEquipments() {
             closeModal('modal-equipment');
             resetEquipmentModal();
             await loadEquipments();
+            refreshEquipmentList();
         }
     });
 
@@ -632,35 +755,10 @@ async function loadEquipments() {
     // We also need departments to show the name
     const departments = await fetchAPI('/departments');
     departmentCache = Array.isArray(departments) ? departments : departmentCache;
-    const getDeptName = (id) => departments?.find(d => d.id === id)?.name || 'N/A';
-
-    const tbody = document.getElementById('equipments-tbody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    if (equipments && equipments.length > 0) {
-        equipments.forEach(eq => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${eq.id}</td>
-                <td>${escapeHtml(eq.name)}</td>
-                <td>${escapeHtml(eq.type)}</td>
-                <td>${escapeHtml(formatEquipmentSpecs(eq.type, eq.specs))}</td>
-                <td>${escapeHtml(eq.status)}</td>
-                <td>${escapeHtml(getDeptName(eq.department_id))}</td>
-                <td>${escapeHtml(eq.user_assigned || '')}</td>
-                <td>
-                    <button class="btn" style="margin-right: 8px;" onclick="duplicateEquipment(${eq.id})">Nhân bản</button>
-                    <button class="btn" style="margin-right: 8px;" onclick="openEquipmentDetail(${eq.id})">Xem</button>
-                    <button class="btn btn-primary" style="margin-right: 8px;" onclick="editEquipment(${eq.id})">Sửa</button>
-                    <button class="btn btn-danger" onclick="deleteEquipment(${eq.id})">Xóa</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } else {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Chưa có dữ liệu</td></tr>';
-    }
+    renderEquipmentTypeOptions();
+    renderEquipmentDepartmentOptions();
+    bindEquipmentFilters();
+    refreshEquipmentList();
 }
 
 function editEquipment(id) {
@@ -684,7 +782,7 @@ function openEquipmentDetail(id) {
 async function deleteEquipment(id) {
     if (confirm('Bạn có chắc chắn muốn xóa thiết bị này?')) {
         await fetchAPI(`/equipments/${id}`, 'DELETE');
-        await loadEquipments();
+        refreshEquipmentList();
     }
 }
 
