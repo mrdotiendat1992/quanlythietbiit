@@ -10,6 +10,7 @@ const EQUIPMENT_SPEC_FIELDS = {
         { key: 'main_code', label: 'Mã main' },
         { key: 'chip', label: 'Chip' },
         { key: 'ram', label: 'RAM' },
+        { key: 'ip_address', label: 'IP tĩnh' },
         { key: 'hard_drive', label: 'Ổ cứng' },
         { key: 'monitor', label: 'Màn hình' },
         { key: 'keyboard', label: 'Bàn phím' },
@@ -19,13 +20,14 @@ const EQUIPMENT_SPEC_FIELDS = {
         { key: 'main_code', label: 'Mã main' },
         { key: 'chip', label: 'Chip' },
         { key: 'ram', label: 'RAM' },
+        { key: 'ip_address', label: 'IP tĩnh' },
         { key: 'hard_drive', label: 'Ổ cứng' },
         { key: 'monitor', label: 'Màn hình' },
         { key: 'keyboard', label: 'Bàn phím' },
         { key: 'mouse', label: 'Chuột' },
     ],
     'Máy in': [
-        { key: 'ip_address', label: 'IP' },
+        { key: 'ip_address', label: 'IP tĩnh' },
         { key: 'printer_model', label: 'Loại máy' },
     ],
 };
@@ -119,6 +121,12 @@ function getEquipmentSpecPanelKey(type) {
     return 'other';
 }
 
+function getEquipmentSpecInputId(type, key) {
+    if (key === 'ip_address' && type === 'Máy in') return 'eq-spec-printer-ip_address';
+    if (key === 'ip_address') return 'eq-spec-ip_address';
+    return `eq-spec-${key}`;
+}
+
 function setEquipmentType(type) {
     const typeSelect = document.getElementById('eq-type');
     if (typeSelect) typeSelect.value = type;
@@ -132,22 +140,22 @@ function setEquipmentType(type) {
 
 function clearEquipmentSpecInputs() {
     getEquipmentSpecFields('Máy tính bàn').forEach(field => {
-        const input = document.getElementById(`eq-spec-${field.key}`);
+        const input = document.getElementById(getEquipmentSpecInputId('Máy tính bàn', field.key));
         if (input) input.value = '';
     });
     getEquipmentSpecFields('Laptop').forEach(field => {
-        const input = document.getElementById(`eq-spec-${field.key}`);
+        const input = document.getElementById(getEquipmentSpecInputId('Laptop', field.key));
         if (input) input.value = '';
     });
     getEquipmentSpecFields('Máy in').forEach(field => {
-        const input = document.getElementById(`eq-spec-${field.key}`);
+        const input = document.getElementById(getEquipmentSpecInputId('Máy in', field.key));
         if (input) input.value = '';
     });
 }
 
 function populateEquipmentSpecInputs(type, specs = {}) {
     getEquipmentSpecFields(type).forEach(field => {
-        const input = document.getElementById(`eq-spec-${field.key}`);
+        const input = document.getElementById(getEquipmentSpecInputId(type, field.key));
         if (input) input.value = specs[field.key] || '';
     });
 }
@@ -210,7 +218,7 @@ function collectEquipmentSpecs(type) {
 
     const specs = {};
     fields.forEach(field => {
-        const input = document.getElementById(`eq-spec-${field.key}`);
+        const input = document.getElementById(getEquipmentSpecInputId(type, field.key));
         const value = input?.value.trim();
         if (value) specs[field.key] = value;
     });
@@ -230,6 +238,111 @@ function formatEquipmentSpecs(type, specs) {
         .map(field => specs[field.key] ? `${field.label}: ${specs[field.key]}` : null)
         .filter(Boolean)
         .join(' | ') || '-';
+}
+
+function renderEquipmentSpecsDetail(type, specs) {
+    if (!specs || Object.keys(specs).length === 0) {
+        return '<p class="equipment-detail-empty">Chưa có thông số riêng.</p>';
+    }
+
+    const fields = getEquipmentSpecFields(type);
+    const renderedKeys = new Set();
+    let html = '<div class="equipment-detail-grid">';
+
+    fields.forEach(field => {
+        if (specs[field.key]) {
+            renderedKeys.add(field.key);
+            html += `<div class="equipment-detail-item"><span>${escapeHtml(field.label)}</span><strong>${escapeHtml(specs[field.key])}</strong></div>`;
+        }
+    });
+
+    Object.entries(specs).forEach(([key, value]) => {
+        if (renderedKeys.has(key) || !value) return;
+        html += `<div class="equipment-detail-item"><span>${escapeHtml(key)}</span><strong>${escapeHtml(value)}</strong></div>`;
+    });
+
+    html += '</div>';
+    return html;
+}
+
+function openEquipmentDetailModal(equipment) {
+    const content = document.getElementById('equipment-detail-content');
+    if (!content || !equipment) return;
+
+    const deptName = departmentCache.find(item => item.id === equipment.department_id)?.name || 'Chưa phân bổ';
+    content.innerHTML = `
+        <div class="equipment-detail-header">
+            <div>
+                <div class="equipment-detail-kicker">${escapeHtml(equipment.type || 'Thiết bị')}</div>
+                <h3>${escapeHtml(equipment.name || '')}</h3>
+            </div>
+            <span class="equipment-detail-badge">${escapeHtml(equipment.status || '')}</span>
+        </div>
+        <div class="equipment-detail-meta">
+            <div><span>Phòng ban</span><strong>${escapeHtml(deptName)}</strong></div>
+            <div><span>Người dùng</span><strong>${escapeHtml(equipment.user_assigned || '-')}</strong></div>
+        </div>
+        ${renderEquipmentSpecsDetail(equipment.type, equipment.specs || {})}
+    `;
+
+    openModal('modal-equipment-detail');
+}
+
+function toFlatText(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+}
+
+async function exportReportsToExcel() {
+    if (!window.XLSX) {
+        alert('Chưa tải được thư viện Excel. Vui lòng kiểm tra kết nối mạng.');
+        return;
+    }
+
+    const [departments, equipments, logs] = await Promise.all([
+        fetchAPI('/departments') || [],
+        fetchAPI('/equipments') || [],
+        fetchAPI('/logs') || [],
+    ]);
+
+    const departmentMap = new Map((departments || []).map(dept => [dept.id, dept.name]));
+    const equipmentMap = new Map((equipments || []).map(eq => [eq.id, eq.name]));
+
+    const workbook = XLSX.utils.book_new();
+
+    const departmentSheet = XLSX.utils.json_to_sheet((departments || []).map(dept => ({
+        ID: dept.id,
+        'Tên phòng ban': dept.name,
+        'Mô tả': dept.description || '',
+    })));
+
+    const equipmentSheet = XLSX.utils.json_to_sheet((equipments || []).map(eq => ({
+        ID: eq.id,
+        'Tên thiết bị': eq.name,
+        'Loại': eq.type,
+        'Trạng thái': eq.status,
+        'Phòng ban': departmentMap.get(eq.department_id) || '',
+        'Người dùng': eq.user_assigned || '',
+        'Thông số': formatEquipmentSpecs(eq.type, eq.specs),
+    })));
+
+    const logSheet = XLSX.utils.json_to_sheet((logs || []).map(log => ({
+        ID: log.id,
+        'Thời gian': log.date ? new Date(log.date).toLocaleString() : '',
+        'Nhân sự IT': log.it_personnel,
+        'Mô tả': log.description,
+        'Thiết bị': equipmentMap.get(log.equipment_id) || '',
+        'Phòng ban': departmentMap.get(log.department_id || log.department?.id) || '',
+        'Trạng thái': log.status,
+    })));
+
+    XLSX.utils.book_append_sheet(workbook, departmentSheet, 'Phong ban');
+    XLSX.utils.book_append_sheet(workbook, equipmentSheet, 'Thiet bi');
+    XLSX.utils.book_append_sheet(workbook, logSheet, 'Log IT');
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    XLSX.writeFile(workbook, `bao-cao-it-${stamp}.xlsx`);
 }
 
 // Global initialization based on page
@@ -513,6 +626,7 @@ async function loadEquipments() {
     equipmentCache = Array.isArray(equipments) ? equipments : [];
     // We also need departments to show the name
     const departments = await fetchAPI('/departments');
+    departmentCache = Array.isArray(departments) ? departments : departmentCache;
     const getDeptName = (id) => departments?.find(d => d.id === id)?.name || 'N/A';
 
     const tbody = document.getElementById('equipments-tbody');
@@ -531,6 +645,7 @@ async function loadEquipments() {
                 <td>${escapeHtml(getDeptName(eq.department_id))}</td>
                 <td>${escapeHtml(eq.user_assigned || '')}</td>
                 <td>
+                    <button class="btn" style="margin-right: 8px;" onclick="openEquipmentDetail(${eq.id})">Xem</button>
                     <button class="btn btn-primary" style="margin-right: 8px;" onclick="editEquipment(${eq.id})">Sửa</button>
                     <button class="btn btn-danger" onclick="deleteEquipment(${eq.id})">Xóa</button>
                 </td>
@@ -546,6 +661,12 @@ function editEquipment(id) {
     const equipment = equipmentCache.find(item => item.id === id);
     if (!equipment) return;
     openEquipmentModal(equipment);
+}
+
+function openEquipmentDetail(id) {
+    const equipment = equipmentCache.find(item => item.id === id);
+    if (!equipment) return;
+    openEquipmentDetailModal(equipment);
 }
 
 async function deleteEquipment(id) {

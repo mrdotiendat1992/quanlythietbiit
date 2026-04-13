@@ -319,6 +319,55 @@ tr:hover {
   gap: 12px;
 }
 
+.equipment-detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.equipment-detail-kicker {
+  color: var(--text-light);
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.equipment-detail-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.equipment-detail-meta,
+.equipment-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+.equipment-detail-meta {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 16px;
+}
+.equipment-detail-meta span,
+.equipment-detail-item span {
+  display: block;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+.equipment-detail-item,
+.equipment-detail-meta > div {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.equipment-detail-empty {
+  color: var(--text-light);
+}
+
 @media (max-width: 640px) {
   .modal {
     max-height: calc(100vh - 24px);

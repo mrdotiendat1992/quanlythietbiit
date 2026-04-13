@@ -97,6 +97,10 @@
                             <input type="text" id="eq-spec-ram" class="form-control" placeholder="VD: 16GB">
                         </div>
                         <div class="spec-field">
+                            <label>IP tĩnh</label>
+                            <input type="text" id="eq-spec-ip_address" class="form-control" placeholder="VD: 192.168.1.50">
+                        </div>
+                        <div class="spec-field">
                             <label>Ổ cứng</label>
                             <input type="text" id="eq-spec-hard_drive" class="form-control" placeholder="VD: SSD 512GB">
                         </div>
@@ -116,11 +120,11 @@
                 </div>
                 <div class="equipment-spec-panel is-hidden" data-equipment-spec-panel="printer">
                     <h3 class="equipment-spec-title">Thông số máy in</h3>
-                    <p class="equipment-spec-note">Quản lý IP và model để hỗ trợ mạng in nhanh hơn.</p>
+                    <p class="equipment-spec-note">Quản lý IP tĩnh và model để hỗ trợ mạng in nhanh hơn.</p>
                     <div class="spec-grid">
                         <div class="spec-field">
-                            <label>IP</label>
-                            <input type="text" id="eq-spec-ip_address" class="form-control" placeholder="VD: 192.168.1.120">
+                            <label>IP tĩnh</label>
+                            <input type="text" id="eq-spec-printer-ip_address" class="form-control" placeholder="VD: 192.168.1.120">
                         </div>
                         <div class="spec-field">
                             <label>Loại máy</label>
@@ -156,6 +160,16 @@
                     <button type="submit" class="btn btn-primary" id="equipment-submit-btn">Lưu</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-equipment-detail">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Chi tiết thiết bị</h2>
+                <button class="close-btn" onclick="closeModal('modal-equipment-detail')">×</button>
+            </div>
+            <div id="equipment-detail-content"></div>
         </div>
     </div>
 
