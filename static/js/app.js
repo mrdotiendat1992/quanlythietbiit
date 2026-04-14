@@ -429,6 +429,93 @@ function openEquipmentDetailModal(equipment) {
     openModal('modal-equipment-detail');
 }
 
+function openEquipmentImportModal() {
+    const input = document.getElementById('equipment-import-file');
+    if (input) input.value = '';
+    openModal('modal-equipment-import');
+}
+
+function normalizeHeader(value) {
+    return normalizeText(value).replace(/\s+/g, '');
+}
+
+function getRowValue(row, keys) {
+    const normalized = {};
+    Object.entries(row || {}).forEach(([key, value]) => {
+        normalized[normalizeHeader(key)] = value;
+    });
+    for (const key of keys) {
+        const value = normalized[normalizeHeader(key)];
+        if (value !== undefined && value !== null && String(value).trim() !== '') return String(value).trim();
+    }
+    return '';
+}
+
+function parseEquipmentSpecsFromRow(type, row) {
+    const specs = {};
+    getEquipmentSpecFields(type).forEach(field => {
+        const value = getRowValue(row, [field.label, field.key]);
+        if (value) specs[field.key] = value;
+    });
+    return Object.keys(specs).length ? specs : null;
+}
+
+async function importEquipmentFromExcel() {
+    if (!window.XLSX) {
+        alert('Chưa tải được thư viện Excel.');
+        return;
+    }
+
+    const fileInput = document.getElementById('equipment-import-file');
+    const file = fileInput?.files?.[0];
+    if (!file) {
+        alert('Hãy chọn file Excel trước.');
+        return;
+    }
+
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+    if (!rows.length) {
+        alert('File Excel không có dữ liệu.');
+        return;
+    }
+
+    const departments = await fetchAPI('/departments') || [];
+    const deptMap = new Map(departments.map(dept => [normalizeHeader(dept.name), dept.id]));
+
+    const payloads = rows
+        .map(row => {
+            const name = getRowValue(row, ['Tên thiết bị', 'Tên', 'Name']);
+            if (!name) return null;
+
+            const type = getRowValue(row, ['Loại', 'Type']) || 'Khác';
+            const status = getRowValue(row, ['Trạng thái', 'Status']) || 'Đang sử dụng';
+            const departmentName = getRowValue(row, ['Phòng ban', 'Department']);
+            const department_id = departmentName ? (deptMap.get(normalizeHeader(departmentName)) || null) : null;
+            const inventory_code = getRowValue(row, ['Mã kiểm kê', 'Inventory code', 'Inventory Code']);
+            const user_assigned = getRowValue(row, ['Người dùng', 'User', 'Assigned to']);
+            const specs = parseEquipmentSpecsFromRow(type, row);
+            return { name, inventory_code, type, status, user_assigned, department_id, specs };
+        })
+        .filter(Boolean);
+
+    if (!payloads.length) {
+        alert('Không tìm thấy dòng hợp lệ để import.');
+        return;
+    }
+
+    const results = await Promise.all(payloads.map(payload => fetchAPI('/equipments', 'POST', payload)));
+    const successCount = results.filter(Boolean).length;
+
+    closeModal('modal-equipment-import');
+    await loadEquipments();
+    refreshEquipmentList();
+    alert(`Đã import ${successCount}/${payloads.length} thiết bị.`);
+}
+
 function toFlatText(value) {
     if (value === null || value === undefined) return '';
     if (typeof value === 'object') return JSON.stringify(value);

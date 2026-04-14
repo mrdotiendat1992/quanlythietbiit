@@ -9,6 +9,7 @@
 - **Mã kiểm kê thiết bị:** Quản lý theo mã kiểm kê riêng để tra cứu, lọc và nhân bản nhanh.
 - **Xem chi tiết thiết bị:** Mở modal để xem đầy đủ các thông số đã nhập.
 - **Xuất Excel:** Từ Dashboard có thể tải báo cáo tổng hợp Phòng ban, Thiết bị và Log IT ra file `.xlsx`.
+- **Nhập Excel hàng loạt:** Có thể tải nhiều thiết bị lên từ file `.xlsx` với các cột tương ứng.
 - **Lọc/Sắp xếp thiết bị:** Tìm theo tên, lọc theo loại/phòng ban/trạng thái và sắp xếp theo ID hoặc tên.
 - **Lịch Sử Sửa Chữa (IT Logs):** Ghi nhớ lại nhật ký xử lý, bảo trì và log công việc xử lý sự cố hàng ngày của nhân viên.
 - **GitHub Pages + Supabase:** Frontend tĩnh, backend không cần riêng. Dữ liệu lưu trên Supabase Postgres.

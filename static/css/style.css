@@ -390,6 +390,11 @@ tr:hover {
   color: var(--text-light);
 }
 
+.equipment-spec-note {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
 @media (max-width: 640px) {
   .modal {
     max-height: calc(100vh - 24px);

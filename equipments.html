@@ -21,7 +21,10 @@
     <main class="main-content">
         <div class="page-header">
             <h1 class="page-title">Quản lý Thiết bị</h1>
-            <button class="btn btn-primary" onclick="openEquipmentModal()">+ Thêm thiết bị</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn" onclick="openEquipmentImportModal()">Import Excel</button>
+                <button class="btn btn-primary" onclick="openEquipmentModal()">+ Thêm thiết bị</button>
+            </div>
         </div>
 
         <div class="card equipment-toolbar">
@@ -187,6 +190,24 @@
                 <button class="close-btn" onclick="closeModal('modal-equipment-detail')">×</button>
             </div>
             <div id="equipment-detail-content"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-equipment-import">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Import thiết bị từ Excel</h2>
+                <button class="close-btn" onclick="closeModal('modal-equipment-import')">×</button>
+            </div>
+            <div class="form-group">
+                <label>Chọn file .xlsx</label>
+                <input type="file" id="equipment-import-file" class="form-control" accept=".xlsx,.xls">
+            </div>
+            <p class="equipment-spec-note">Cột gợi ý: `Mã kiểm kê`, `Tên thiết bị`, `Loại`, `Trạng thái`, `Phòng ban`, `Người dùng`, `Mã main`, `Chip`, `RAM`, `IP tĩnh`, `Ổ cứng`, `Màn hình`, `Bàn phím`, `Chuột`, `Loại máy`.</p>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background:#E5E7EB; color:#374151" onclick="closeModal('modal-equipment-import')">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="importEquipmentFromExcel()">Tải lên</button>
+            </div>
         </div>
     </div>
 
