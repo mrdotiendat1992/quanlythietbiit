@@ -6,6 +6,7 @@
 - **Quản lý Phòng Ban:** Quản lý các đơn vị phòng ban dễ dàng để quy trách nhiệm khi phân bổ thiết bị.
 - **Quản lý Thiết Bị IT:** Theo dõi vòng đời, nguồn gốc và danh mục thiết bị của toàn công ty trên giao diện web trực quan.
 - **Thông số theo loại thiết bị:** Máy tính/laptop có thể lưu main, chip, RAM, ổ cứng, IP tĩnh, màn hình, bàn phím, chuột; máy in có thể lưu IP tĩnh và loại máy.
+- **Mã kiểm kê thiết bị:** Quản lý theo mã kiểm kê riêng để tra cứu, lọc và nhân bản nhanh.
 - **Xem chi tiết thiết bị:** Mở modal để xem đầy đủ các thông số đã nhập.
 - **Xuất Excel:** Từ Dashboard có thể tải báo cáo tổng hợp Phòng ban, Thiết bị và Log IT ra file `.xlsx`.
 - **Lọc/Sắp xếp thiết bị:** Tìm theo tên, lọc theo loại/phòng ban/trạng thái và sắp xếp theo ID hoặc tên.

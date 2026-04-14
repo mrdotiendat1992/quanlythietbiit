@@ -35,6 +35,7 @@ const EQUIPMENT_SPEC_FIELDS = {
 let equipmentCache = [];
 let departmentCache = [];
 let logCache = [];
+let equipmentFiltersBound = false;
 let equipmentFilters = {
     search: '',
     type: '',
@@ -185,6 +186,12 @@ function buildDuplicateEquipmentName(name) {
     return base.endsWith(' (Bản sao)') ? base : `${base} (Bản sao)`;
 }
 
+function getDuplicateInventoryCode(code) {
+    const base = (code || '').trim();
+    if (!base) return '';
+    return base.endsWith('-COPY') ? base : `${base}-COPY`;
+}
+
 function openEquipmentModal(equipment = null, departmentId = null, mode = 'edit') {
     resetEquipmentModal();
 
@@ -199,6 +206,7 @@ function openEquipmentModal(equipment = null, departmentId = null, mode = 'edit'
         if (submitBtn) submitBtn.textContent = mode === 'duplicate' ? 'Tạo bản sao' : 'Cập nhật';
 
         document.getElementById('eq-name').value = mode === 'duplicate' ? buildDuplicateEquipmentName(equipment.name) : (equipment.name || '');
+        document.getElementById('eq-inventory-code').value = mode === 'duplicate' ? '' : (equipment.inventory_code || '');
         document.getElementById('eq-status').value = equipment.status || 'Đang sử dụng';
         document.getElementById('eq-user').value = equipment.user_assigned || '';
         document.getElementById('eq-department').value = equipment.department_id ? String(equipment.department_id) : '';
@@ -227,7 +235,8 @@ function getEquipmentDepartmentName(id) {
 
 function getSortedAndFilteredEquipments() {
     const filtered = equipmentCache.filter(eq => {
-        const matchesSearch = !equipmentFilters.search || normalizeText(eq.name).includes(normalizeText(equipmentFilters.search));
+        const query = normalizeText(equipmentFilters.search);
+        const matchesSearch = !query || normalizeText(eq.name).includes(query) || normalizeText(eq.inventory_code).includes(query);
         const matchesType = !equipmentFilters.type || eq.type === equipmentFilters.type;
         const matchesDepartment = !equipmentFilters.department || String(eq.department_id || '') === equipmentFilters.department;
         const matchesStatus = !equipmentFilters.status || eq.status === equipmentFilters.status;
@@ -316,6 +325,7 @@ function refreshEquipmentList() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${eq.id}</td>
+                <td>${escapeHtml(eq.inventory_code || '')}</td>
                 <td>${escapeHtml(eq.name)}</td>
                 <td>${escapeHtml(eq.type)}</td>
                 <td>${escapeHtml(formatEquipmentSpecs(eq.type, eq.specs))}</td>
@@ -332,11 +342,14 @@ function refreshEquipmentList() {
             tbody.appendChild(tr);
         });
     } else {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Chưa có dữ liệu</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Chưa có dữ liệu</td></tr>';
     }
 }
 
 function bindEquipmentFilters() {
+    if (equipmentFiltersBound) return;
+    equipmentFiltersBound = true;
+
     const search = document.getElementById('equipment-search');
     const type = document.getElementById('equipment-filter-type');
     const department = document.getElementById('equipment-filter-department');
@@ -406,6 +419,7 @@ function openEquipmentDetailModal(equipment) {
             <span class="equipment-detail-badge">${escapeHtml(equipment.status || '')}</span>
         </div>
         <div class="equipment-detail-meta">
+            <div><span>Mã kiểm kê</span><strong>${escapeHtml(equipment.inventory_code || '-')}</strong></div>
             <div><span>Phòng ban</span><strong>${escapeHtml(deptName)}</strong></div>
             <div><span>Người dùng</span><strong>${escapeHtml(equipment.user_assigned || '-')}</strong></div>
         </div>
@@ -446,6 +460,7 @@ async function exportReportsToExcel() {
 
     const equipmentSheet = XLSX.utils.json_to_sheet((equipments || []).map(eq => ({
         ID: eq.id,
+        'Mã kiểm kê': eq.inventory_code || '',
         'Tên thiết bị': eq.name,
         'Loại': eq.type,
         'Trạng thái': eq.status,
@@ -722,6 +737,7 @@ async function initEquipments() {
         e.preventDefault();
         const eqId = document.getElementById('eq-id').value;
         const name = document.getElementById('eq-name').value;
+        const inventory_code = document.getElementById('eq-inventory-code').value.trim();
         const type = document.getElementById('eq-type').value;
         const status = document.getElementById('eq-status').value;
         const user_assigned = document.getElementById('eq-user').value;
@@ -729,7 +745,7 @@ async function initEquipments() {
         const department_id = dept_val ? parseInt(dept_val) : null;
         const specs = collectEquipmentSpecs(type);
 
-        const payload = { name, type, status, user_assigned, department_id, specs };
+        const payload = { name, inventory_code, type, status, user_assigned, department_id, specs };
         const endpoint = eqId ? `/equipments/${eqId}` : '/equipments';
         const method = eqId ? 'PUT' : 'POST';
         
